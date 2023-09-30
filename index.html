@@ -1,1 +1,168 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>4-in-a-Row Game</title>
+    <style>
+        h1 {
+          text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(7, 40px);
+            grid-gap: 5px;
+            border: 2px solid black;
+            margin: 0 auto;
+            width: 320px;
+            background-color: lightskyblue;
+            padding: 5px 0px 5px 5px ;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            border: 2px solid black;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cell.empty {
+            background-color: #fff;
+        }
+
+        .cell.red {
+            background-color: red;
+            color: white;
+        }
+
+        .cell.yellow {
+            background-color: yellow;
+        }
+        div{
+            display: grid;
+            place-items: center;
+        }
+        button{
+            background: green;
+            color: #333;
+            padding: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>4-in-a-Row Game</h1>
+    <div class="board" id="board"></div>
+    <br>
+    <div><button onclick="resetGame()">Reset Game</button></div>
+
+    <script>
+        const board = document.getElementById('board');
+        const rows = 6;
+        const cols = 7;
+        let currentPlayer = 'red';
+        let isGameOver = false;
+        const cells = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+
+        function createCell(row, col) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell', 'empty');
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.addEventListener('click', () => handleCellClick(col));
+            return cell;
+        }
+
+        function renderBoard() {
+            board.innerHTML = '';
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const cell = createCell(row, col);
+                    if (cells[row][col] === 'red') {
+                        cell.classList.remove('empty');
+                        cell.classList.add('red');
+                    } else if (cells[row][col] === 'yellow') {
+                        cell.classList.remove('empty');
+                        cell.classList.add('yellow');
+                    }
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function checkWinner(row, col) {
+            const directions = [
+                [0, 1], [1, 0], [1, 1], [1, -1] // horizontal, vertical, diagonal (both directions)
+            ];
+
+            for (const [dx, dy] of directions) {
+                let count = 1;
+                for (let i = 1; i <= 3; i++) {
+                    const newRow = row + i * dx;
+                    const newCol = col + i * dy;
+                    if (
+                        newRow >= 0 && newRow < rows &&
+                        newCol >= 0 && newCol < cols &&
+                        cells[newRow][newCol] === currentPlayer
+                    ) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+
+                for (let i = 1; i <= 3; i++) {
+                    const newRow = row - i * dx;
+                    const newCol = col - i * dy;
+                    if (
+                        newRow >= 0 && newRow < rows &&
+                        newCol >= 0 && newCol < cols &&
+                        cells[newRow][newCol] === currentPlayer
+                    ) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (count >= 4) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function handleCellClick(col) {
+            if (isGameOver) return;
+
+            for (let row = rows - 1; row >= 0; row--) {
+                if (!cells[row][col]) {
+                    cells[row][col] = currentPlayer;
+                    renderBoard();
+                    if (checkWinner(row, col)) {
+                        alert(currentPlayer.toUpperCase() + ' wins!');
+                        isGameOver = true;
+                        return;
+                    }
+                    currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+                    return;
+                }
+            }
+        }
+
+        function resetGame() {
+            cells.forEach(row => row.fill(null));
+            currentPlayer = 'red';
+            isGameOver = false;
+            renderBoard();
+        }
+
+        renderBoard();
+    </script>
+</body>
+  </html>
+  
