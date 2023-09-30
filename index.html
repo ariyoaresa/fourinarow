@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>4-in-a-Row Game</title>
     <style>
-        h1 {
-          text-align: center;
+        h1{
+            text-align: center;
         }
         .board {
             display: grid;
@@ -41,6 +40,12 @@
         .cell.yellow {
             background-color: yellow;
         }
+        #player-turn{
+            text-align: center;
+        }
+        p span{
+            font-weight: bold;
+        }
         div{
             display: grid;
             place-items: center;
@@ -57,7 +62,10 @@
     <h1>4-in-a-Row Game</h1>
     <div class="board" id="board"></div>
     <br>
+    <p id="player-turn">Current Player: <span id="current-player">red</span></p>
+    
     <div><button onclick="resetGame()">Reset Game</button></div>
+    
 
     <script>
         const board = document.getElementById('board');
@@ -128,41 +136,40 @@
                     }
                 }
 
-                if (count >= 4) {
-                    return true;
+                if (count >= 4) { // four in a row
+                    isGameOver = true; // game over
+                    alert(currentPlayer + ' wins!'); // show winner
                 }
             }
-
-            return false;
         }
 
         function handleCellClick(col) {
-            if (isGameOver) return;
-
-            for (let row = rows - 1; row >= 0; row--) {
-                if (!cells[row][col]) {
-                    cells[row][col] = currentPlayer;
-                    renderBoard();
-                    if (checkWinner(row, col)) {
-                        alert(currentPlayer.toUpperCase() + ' wins!');
-                        isGameOver = true;
-                        return;
-                    }
-                    currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
-                    return;
+            if (isGameOver) return; // do nothing if game is over
+            for (let row = rows - 1; row >= 0; row--) { // start from bottom row
+                if (cells[row][col] === null) { // find the first empty cell in the column
+                    cells[row][col] = currentPlayer; // fill it with current player's color
+                    renderBoard(); // update the board
+                    checkWinner(row, col); // check if there is a winner
+                    switchPlayer(); // switch to next player
+                    break; // exit the loop
                 }
             }
         }
 
-        function resetGame() {
-            cells.forEach(row => row.fill(null));
-            currentPlayer = 'red';
-            isGameOver = false;
-            renderBoard();
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red'; // switch the value of currentPlayer variable
+            document.getElementById('current-player').textContent = currentPlayer; // update the text content of the current-player span element
         }
 
-        renderBoard();
+        function resetGame() {
+            currentPlayer = 'red'; // reset current player to red
+            isGameOver = false; // reset game over flag to false
+            cells.forEach(row => row.fill(null)); // reset all cells to null
+            renderBoard(); // update the board
+            document.getElementById('current-player').textContent = currentPlayer; // update the text content of the current-player span element
+        }
+
+        renderBoard(); // initial render of the board
     </script>
 </body>
-  </html>
-  
+</html>
